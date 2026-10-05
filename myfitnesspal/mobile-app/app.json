@@ -59,10 +59,14 @@
       "reactCompiler": true
     },
     "extra": {
-      "router": {}
+      "router": {},
+      "eas": {
+        "projectId": "4a433f9a-8405-49de-8a08-b3174105d8eb"
+      }
     },
     "runtimeVersion": {
       "policy": "appVersion"
-    }
+    },
+    "owner": "aaronduffin"
   }
 }
