@@ -23,9 +23,9 @@ const TAB_META: Record<string, TabMeta> = {
     iconActive: "stats-chart",
   },
   more: {
-    label: "More",
-    icon: "ellipsis-horizontal",
-    iconActive: "ellipsis-horizontal",
+    label: "Settings",
+    icon: "settings-outline",
+    iconActive: "settings",
   },
 };
 

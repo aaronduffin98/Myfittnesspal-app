@@ -7,6 +7,7 @@ import {
   boolean,
   numeric,
   date,
+  integer,
 } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
@@ -58,5 +59,17 @@ export const foodEntries = pgTable("food_entries", {
     .notNull(),
   loggedDate: date("logged_date").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// One row per user. No row means the app shows its built-in defaults.
+export const userGoals = pgTable("user_goals", {
+  userId: uuid("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  calories: integer("calories").notNull(),
+  carbs: integer("carbs").notNull(),
+  fat: integer("fat").notNull(),
+  protein: integer("protein").notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

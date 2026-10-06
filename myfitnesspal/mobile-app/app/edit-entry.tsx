@@ -6,7 +6,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Toast } from "toastify-react-native";
 import { AppText } from "@/components/AppText";
 import { CalorieRing } from "@/components/CalorieRing";
-import { colors as appColors, dailyGoals, MEAL_LABELS, MEALS, type Meal } from "@/lib/constants";
+import { colors as appColors, MEAL_LABELS, MEALS, type Meal } from "@/lib/constants";
+import { useGoals } from "@/hooks/useGoals";
 import type { FoodItem } from "@/lib/openfoodfacts";
 import { useDiary } from "@/providers/DiaryProvider";
 
@@ -179,6 +180,7 @@ export default function EditEntryScreen() {
     entryId?: string;
   }>();
   const { entries, selectedDate, addEntry, updateEntry } = useDiary();
+  const dailyGoals = useGoals();
 
   const existingEntry = params.entryId
     ? entries.find((e) => e.id === params.entryId)

@@ -45,4 +45,5 @@ export const CACHE_KEYS = {
   USER_PROFILE: 'user_profile',
   FOOD_ENTRIES_PREFIX: 'food_entries',
   FOOD_HISTORY: 'food_history',
+  GOALS: 'goals',
 } as const;

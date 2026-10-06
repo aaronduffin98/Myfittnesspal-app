@@ -7,8 +7,9 @@ import { AppText } from "@/components/AppText";
 import { CaloriesCard } from "@/components/CaloriesCard";
 import { MacrosCard } from "@/components/MacrosCard";
 import { MealCard } from "@/components/MealCard";
-import { colors as appColors, dailyGoals, MEALS, MEAL_LABELS, type Meal } from "@/lib/constants";
+import { colors as appColors, MEALS, MEAL_LABELS, type Meal } from "@/lib/constants";
 import { useDiary, type FoodEntry } from "@/providers/DiaryProvider";
+import { useGoals } from "@/hooks/useGoals";
 import { WeekStrip } from "@/components/WeekStrip";
 
 export default function TodayScreen() {
@@ -22,6 +23,7 @@ export default function TodayScreen() {
     refreshing,
     removeEntry,
   } = useDiary();
+  const dailyGoals = useGoals();
 
   const handleLog = useCallback((meal: Meal) => {
     router.push({ pathname: "/log-food", params: { meal } });

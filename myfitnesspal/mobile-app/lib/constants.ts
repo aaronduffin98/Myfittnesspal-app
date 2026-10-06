@@ -16,7 +16,8 @@ export const colors = {
   "track-gray": "#E7E9EC",
 } as const;
 
-// Daily nutrition goals shown on the Today dashboard.
+// Default daily nutrition goals, used until the user saves their own in
+// Settings (see hooks/useGoals.ts).
 // 180g carbs * 4 + 60g fat * 9 + 200g protein * 4 = 2060 kcal
 export const dailyGoals = {
   calories: 2060,

@@ -7,6 +7,7 @@ import { users } from "./schema.ts";
 import { authMiddleware } from "./auth.ts";
 import type { AppEnv } from "./types.ts";
 import foodEntriesRoutes from "./routes-food-entries.ts";
+import goalsRoutes from "./routes-goals.ts";
 
 const updateMeSchema = z.object({
   fullName: z.string().trim().min(1).max(200).optional(),
@@ -38,6 +39,7 @@ const api = new Hono<AppEnv>()
     return c.json(newUser);
   })
   .route("/food-entries", foodEntriesRoutes)
+  .route("/goals", goalsRoutes)
   .get("/me", async (c) => {
     const authUser = c.get("user");
 
