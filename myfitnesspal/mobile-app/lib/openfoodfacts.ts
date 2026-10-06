@@ -2,6 +2,10 @@
 // Docs: https://openfoodfacts.github.io/openfoodfacts-server/api/
 
 const BASE_URL = "https://world.openfoodfacts.org";
+// Newer search service: faster, better ranking, and not capped at
+// 10 requests/minute like the legacy /cgi/search.pl endpoint.
+// Docs: https://search.openfoodfacts.org/docs
+const SEARCH_URL = "https://search.openfoodfacts.org/search";
 const USER_AGENT = "MyFitnessPalClone/1.0 (Expo React Native)";
 
 const FIELDS =
@@ -31,7 +35,8 @@ interface OffNutriments {
 interface OffProduct {
   code?: string;
   product_name?: string;
-  brands?: string;
+  // The legacy API returns a comma-separated string, the search service an array.
+  brands?: string | string[];
   nutriments?: OffNutriments;
   serving_size?: string;
   serving_quantity?: number | string;
@@ -97,7 +102,10 @@ function normalizeProduct(product: OffProduct | undefined): FoodItem | null {
     id: product.code ?? `${name}-${Date.now()}`,
     barcode: product.code,
     name,
-    brand: product.brands?.split(",")[0]?.trim(),
+    brand: (Array.isArray(product.brands)
+      ? product.brands[0]
+      : product.brands?.split(",")[0]
+    )?.trim(),
     verified: !!product.code,
     servingLabel,
     caloriesPerServing: round(
@@ -141,15 +149,41 @@ export async function getProductByBarcode(
   return normalizeProduct(data.product);
 }
 
-export async function searchProducts(
-  query: string,
-  pageSize = 25
-): Promise<FoodItem[]> {
-  const trimmed = query.trim();
-  if (!trimmed) return [];
+function normalizeProducts(products: OffProduct[] | undefined): FoodItem[] {
+  return (products ?? [])
+    .map(normalizeProduct)
+    .filter((item): item is FoodItem => item !== null);
+}
 
+async function searchService(
+  query: string,
+  pageSize: number,
+  signal?: AbortSignal
+): Promise<FoodItem[]> {
   const params = new URLSearchParams({
-    search_terms: trimmed,
+    q: query,
+    page_size: String(pageSize),
+    fields: FIELDS,
+  });
+
+  const response = await fetch(`${SEARCH_URL}?${params}`, {
+    headers: { "User-Agent": USER_AGENT },
+    signal,
+  });
+
+  if (!response.ok) throw new Error(`Search failed: ${response.status}`);
+
+  const data = (await response.json()) as { hits?: OffProduct[] };
+  return normalizeProducts(data.hits);
+}
+
+async function searchLegacy(
+  query: string,
+  pageSize: number,
+  signal?: AbortSignal
+): Promise<FoodItem[]> {
+  const params = new URLSearchParams({
+    search_terms: query,
     search_simple: "1",
     action: "process",
     json: "1",
@@ -159,13 +193,29 @@ export async function searchProducts(
 
   const response = await fetch(`${BASE_URL}/cgi/search.pl?${params}`, {
     headers: { "User-Agent": USER_AGENT },
+    signal,
   });
 
   if (!response.ok) return [];
 
   const data = (await response.json()) as { products?: OffProduct[] };
+  return normalizeProducts(data.products);
+}
 
-  return (data.products ?? [])
-    .map(normalizeProduct)
-    .filter((item): item is FoodItem => item !== null);
+export async function searchProducts(
+  query: string,
+  pageSize = 25,
+  signal?: AbortSignal
+): Promise<FoodItem[]> {
+  const trimmed = query.trim();
+  if (!trimmed) return [];
+
+  try {
+    return await searchService(trimmed, pageSize, signal);
+  } catch (err) {
+    // A cancelled search should stay cancelled, not retry.
+    if (signal?.aborted) throw err;
+    // Fall back to the legacy endpoint if the search service is down.
+    return searchLegacy(trimmed, pageSize, signal);
+  }
 }

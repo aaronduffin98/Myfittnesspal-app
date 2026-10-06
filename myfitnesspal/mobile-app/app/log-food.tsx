@@ -109,19 +109,24 @@ export default function LogFoodScreen() {
     }
 
     setSearching(true);
+    // Cancel this search if the query changes, so a slow, stale response
+    // can never overwrite the results for what the user typed last.
+    const controller = new AbortController();
     debounceRef.current = setTimeout(async () => {
       try {
-        const items = await searchProducts(query);
+        const items = await searchProducts(query, 25, controller.signal);
         setResults(items);
       } catch {
+        if (controller.signal.aborted) return;
         setResults([]);
       } finally {
-        setSearching(false);
+        if (!controller.signal.aborted) setSearching(false);
       }
-    }, 400);
+    }, 600);
 
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
+      controller.abort();
     };
   }, [query]);
 
