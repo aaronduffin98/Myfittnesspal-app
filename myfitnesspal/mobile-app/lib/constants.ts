@@ -16,13 +16,13 @@ export const colors = {
   "track-gray": "#E7E9EC",
 } as const;
 
-// Daily nutrition goals shown on the Today dashboard (matches the reference UI).
-// 366g carbs * 4 + 98g fat * 9 + 146g protein * 4 = 2930 kcal
+// Daily nutrition goals shown on the Today dashboard.
+// 180g carbs * 4 + 60g fat * 9 + 200g protein * 4 = 2060 kcal
 export const dailyGoals = {
-  calories: 2930,
-  carbs: 366,
-  fat: 98,
-  protein: 146,
+  calories: 2060,
+  carbs: 180,
+  fat: 60,
+  protein: 200,
 } as const;
 
 export const MEALS = ["breakfast", "lunch", "dinner", "snacks"] as const;
