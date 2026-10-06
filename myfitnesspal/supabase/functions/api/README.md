@@ -18,5 +18,7 @@ Files map one to one with the original backend:
 | `schema.ts` | `src/db/schema.ts` (identical) |
 | `routes-api.ts` | `src/routes/api.ts` (imports changed only) |
 | `routes-food-entries.ts` | `src/routes/food-entries.ts` (imports changed only) |
+| `routes-goals.ts` | `src/routes/goals.ts` (imports changed only) |
+| `routes-weights.ts` | `src/routes/weights.ts` (imports changed only) |
 
 Differences from the original: runs on Deno, uses the public key instead of the service role key to check tokens, turns off prepared statements for the database client, and no longer writes parts of tokens to the logs.

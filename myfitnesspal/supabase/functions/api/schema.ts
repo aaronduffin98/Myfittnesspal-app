@@ -8,6 +8,7 @@ import {
   numeric,
   date,
   integer,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
@@ -73,3 +74,24 @@ export const userGoals = pgTable("user_goals", {
   protein: integer("protein").notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+// One weigh-in per user per day; logging again on the same day replaces it.
+export const weightEntries = pgTable(
+  "weight_entries",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    weightKg: numeric("weight_kg", { precision: 5, scale: 2 }).notNull(),
+    loggedDate: date("logged_date").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("weight_entries_user_id_logged_date_key").on(
+      table.userId,
+      table.loggedDate
+    ),
+  ]
+);

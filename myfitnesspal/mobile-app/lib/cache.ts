@@ -46,4 +46,5 @@ export const CACHE_KEYS = {
   FOOD_ENTRIES_PREFIX: 'food_entries',
   FOOD_HISTORY: 'food_history',
   GOALS: 'goals',
+  WEIGHTS: 'weights',
 } as const;
